@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.contrastsecurity.joogle.JoogleContext.MatchMode;
 import com.contrastsecurity.joogle.checkers.CreatesTypeChecker;
+import com.contrastsecurity.joogle.checkers.DeclaresFinalize;
 import com.contrastsecurity.joogle.checkers.ImplementsTypeChecker;
 import com.contrastsecurity.joogle.checkers.ZeroArgConstructorChecker;
 import com.contrastsecurity.joogle.checkers.ZeroArgConstructorUsesStaticChecker;
@@ -56,12 +57,8 @@ public class Joogle {
 		LOG.info("**********");
 		LOG.info("Scanning {} paths", paths.size());
 		
-		/*
-		Pattern callerPattern = Pattern.compile(".*\\.(<init>\\(\\)V|<clinit>\\(\\)V|toString\\(\\)L|hashCode\\(\\)|finalize\\(\\)V).*");
-		Pattern calleePattern = Pattern.compile(".*\\.invoke\\(.*");
-		*/
-		
-		JoogleContext context = createProxyHandlerSearch();
+		JoogleContext context = createGadgetSearch();
+		context.blacklist("com.contrastsecurity");
 		joogle.scanDir(paths, context);
 		
 		LOG.info("Scanned {} classes", context.classesScanned());
@@ -72,13 +69,15 @@ public class Joogle {
 		JoogleContext context = new JoogleContext();
 		context.allowInnerClasses(false);
 		context.allowInterfaces(false);
+		context.matchMode(MatchMode.AND);
 		context.verbose(false);
 		ZeroArgConstructorChecker zeroArg = new ZeroArgConstructorChecker();
-		ZeroArgConstructorUsesStaticChecker usesStatic = new ZeroArgConstructorUsesStaticChecker();
-		CreatesTypeChecker createsTypeChecker = new CreatesTypeChecker("java/lang/InvocationHandler");
-		context.addChecker(createsTypeChecker);
-		context.addChecker(usesStatic);
+		//ZeroArgConstructorUsesStaticChecker usesStatic = new ZeroArgConstructorUsesStaticChecker();
+		//CreatesTypeChecker createsTypeChecker = new CreatesTypeChecker("java/lang/InvocationHandler");
+		//context.addChecker(createsTypeChecker);
+		//context.addChecker(usesStatic);
 		context.addChecker(zeroArg);
+		context.addChecker(new DeclaresFinalize());
 		return context;
 	}
 	
@@ -104,7 +103,7 @@ public class Joogle {
 					if (name.endsWith(".jar")) {
 						LOG.debug("Scanning jar {}", file.toFile().getPath());
 						scanJar(file.toFile(), context, path);
-					} else if(isClassName(name,context)) {
+					} else if(isAllowedClass(name,context)) {
 						scanClass(new FileInputStream(file.toFile()), context, path);
 					}
 					return FileVisitResult.CONTINUE;
@@ -115,9 +114,12 @@ public class Joogle {
 		}
 	}
 	
-	boolean isClassName(String name, JoogleContext context) {
+	boolean isAllowedClass(String name, JoogleContext context) {
 		if(name.endsWith(".class")) {
-			return context.allowInnerClasses() ? true : !name.contains("$");
+			if(context.allowInnerClasses() ? true : !name.contains("$")) {
+				String className = name.replace('/', '.');
+				return !context.isBlacklisted(className);
+			}
 		}
 		return false;
 	}
@@ -129,7 +131,7 @@ public class Joogle {
 			Enumeration<JarEntry> e = jf.entries();
 			while (e.hasMoreElements()) {
 				JarEntry entry = e.nextElement();
-				if (isClassName(entry.getName(), context)) {
+				if (isAllowedClass(entry.getName(), context)) {
 					LOG.debug("Scanning class {}", entry.getName());
 					InputStream is = jf.getInputStream(entry);
 					scanClass(is, context, path);

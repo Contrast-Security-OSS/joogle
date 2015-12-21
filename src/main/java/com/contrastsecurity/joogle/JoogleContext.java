@@ -3,8 +3,10 @@ package com.contrastsecurity.joogle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.asm.tree.ClassNode;
 
@@ -24,6 +26,7 @@ public class JoogleContext {
 	
 	private int classesScanned;
 	private int jarsScanned;
+	private Set<String> blacklist;
 	
 	public JoogleContext() {
 		this.verbose = false;
@@ -32,6 +35,7 @@ public class JoogleContext {
 		this.classesScanned = 0;
 		this.jarsScanned = 0;
 		this.matches = new HashMap<String,Integer>();
+		this.blacklist = new HashSet<String>();
 	}
 	
 	public void addChecker(ClassChecker checker) {
@@ -93,5 +97,18 @@ public class JoogleContext {
 	
 	public void verbose(boolean verbose) {
 		this.verbose = verbose;
+	}
+
+	public void blacklist(String pkg) {
+		this.blacklist.add(pkg);
+	}
+	
+	public boolean isBlacklisted(String className) {
+		for(String entry : blacklist) {
+			if(className.startsWith(entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
