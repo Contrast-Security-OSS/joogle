@@ -48,8 +48,13 @@ public class Joogle {
 		if(file.exists() && file.canRead()) {
 			List<String> targetPaths = FileUtils.readLines(file);
 			for(String path : targetPaths) {
-				paths.add(Paths.get(path));
+				path = path.trim();
+				if(!path.startsWith("#")) {
+					paths.add(Paths.get(path));
+				}
 			}
+		} else {
+			LOG.warn("No targets.txt file seen -- only the JRE will be scanned");
 		}
 		
 		LOG.info("**********");
@@ -59,6 +64,7 @@ public class Joogle {
 		
 		JoogleContext context = createGadgetSearch();
 		context.blacklist("com.contrastsecurity");
+		context.blacklist("com.aspectsecurity");
 		joogle.scanDir(paths, context);
 		
 		LOG.info("Scanned {} classes", context.classesScanned());
@@ -101,7 +107,7 @@ public class Joogle {
 					String name = file.toFile().getName();
 					String path = file.toFile().getPath();
 					if (name.endsWith(".jar")) {
-						LOG.debug("Scanning jar {}", file.toFile().getPath());
+						LOG.debug("Scanning jar {}", path);
 						scanJar(file.toFile(), context, path);
 					} else if(isAllowedClass(name,context)) {
 						scanClass(new FileInputStream(file.toFile()), context, path);
