@@ -1,7 +1,7 @@
 joogle
 ========
 
-Joogle is an static analysis program used primarily to find deserialization attack gadgets.
+Joogle is a static analysis program used primarily to find deserialization attack gadgets.
 
 ## Why did you make this?
 
