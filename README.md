@@ -18,14 +18,23 @@ The first way is to create a new Joogle object and call it's APIs directly, like
 ```
 import com.contrastsecurity.joogle.Joogle;
 import com.contrastsecurity.joogle.JoogleContext;
+import com.contrastsecurity.joogle.checkers.ZeroArgConstructorChecker
 
 JoogleContext context = new JoogleContext();
 context.allowInnerClasses(false);
 context.allowInterfaces(false);
+context.addChecker(new ZeroArgConstructorChecker()); // filter to classes with zero argument constructors
 
 // add the user JRE to search
 Set<Path> paths = new HashSet<Path>();
 paths.add(Paths.get(System.getProperty("java.home")));
 
-		
+Joogle joogle = new Joogle();
+joogle.scanPaths(paths, context);
 ```
+
+Alternatively, you can create a file in your current directory called "targets.txt", and call the Joogle main class.
+
+Data is reported to the console and to "target/matches.csv" for automated parsing.
+
+Happy gadget hunting!
