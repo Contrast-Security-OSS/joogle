@@ -10,6 +10,9 @@ import java.util.Set;
 
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Holds the configuration and execution context of a Joogle scan.
+ */
 public class JoogleContext {
 	
 	public enum MatchMode {
@@ -23,6 +26,7 @@ public class JoogleContext {
 	private boolean verbose;
 	private MatchMode matchMode;
 	private Map<String,Integer> matches;
+	private String csvOutputFile;
 	
 	private int classesScanned;
 	private int jarsScanned;
@@ -98,7 +102,15 @@ public class JoogleContext {
 	public void verbose(boolean verbose) {
 		this.verbose = verbose;
 	}
+	
+	public String csvOutputFile() {
+		return csvOutputFile;
+	}
 
+	public void csvOutputFile(String csvOutputFile) {
+		this.csvOutputFile = csvOutputFile;
+	}
+	
 	public void blacklist(String pkg) {
 		this.blacklist.add(pkg);
 	}
@@ -111,4 +123,5 @@ public class JoogleContext {
 		}
 		return false;
 	}
+	
 }
