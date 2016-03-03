@@ -139,6 +139,10 @@ public class Joogle {
 			LOG.error("No class checkers were registered -- nothing to filter on. Exiting.");
 			printUsage(options);
 			return;
+		} else if(context.quiet() && context.csvOutputFile() == null) {
+			LOG.warn("The stdout was suppressed and no CSV output -- nowhere to report results!");
+			printUsage(options);
+			return;
 		}
 		
 		/*
@@ -167,6 +171,7 @@ public class Joogle {
 		context.allowInnerClasses(cmd.hasOption(ALLOW_INNER));
 		context.allowInterfaces(cmd.hasOption(ALLOW_INTERFACES));
 		context.verbose(cmd.hasOption(VERBOSE));
+		context.quiet(cmd.hasOption(SUPPRESS_STDOUT));
 		
 		String mode = cmd.getOptionValue(MODE);
 		if(mode == null || "or".equals(mode)) {
@@ -313,12 +318,14 @@ public class Joogle {
 	void report(List<ClassMatch> matches, ClassNode clazz, JoogleContext context, String path) {
 		String url = "http://grepcode.com/search?query=" + clazz.name.replace('/','.');
 		String className = TypeUtil.toDisplayType(clazz.name);
-		LOG.info("[!] Matched: {} - {} - {}", className, path, url);
-		for(ClassMatch match : matches) {
-			List<String> evidence = match.evidence();
-			if(context.verbose()) {
-				for(String str : evidence) {
-					LOG.info("\t {}", str);	
+		if(!context.quiet()) {
+			LOG.info("[!] Matched: {} - {} - {}", className, path, url);
+			for(ClassMatch match : matches) {
+				if(context.verbose()) {
+					List<String> evidence = match.evidence();
+					for(String str : evidence) {
+						LOG.info("\t {}", str);	
+					}
 				}
 			}
 		}

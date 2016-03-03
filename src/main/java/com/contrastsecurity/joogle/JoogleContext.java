@@ -24,6 +24,7 @@ public class JoogleContext {
 	private boolean allowInnerClasses;
 	private boolean allowInterfaces;
 	private boolean verbose;
+	private boolean quiet;
 	private MatchMode matchMode;
 	private Map<String,Integer> matches;
 	private String csvOutputFile;
@@ -34,6 +35,7 @@ public class JoogleContext {
 	
 	public JoogleContext() {
 		this.verbose = false;
+		this.quiet = false;
 		this.checkers = new ArrayList<ClassChecker>();
 		this.matchMode = MatchMode.OR;
 		this.classesScanned = 0;
@@ -123,5 +125,12 @@ public class JoogleContext {
 		}
 		return false;
 	}
+
+	public void quiet(boolean quiet) {
+		this.quiet = quiet;
+	}
 	
+	public boolean quiet() {
+		return quiet;
+	}
 }

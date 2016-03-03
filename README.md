@@ -18,7 +18,7 @@ If you want to use some of our preconfigured search filters, just build and run 
 ```
 $ git pull https://github.com/Contrast-Security-OSS/joogle.git
 $ mvn package
-$ java -jar target/joogle.jar -s -zeroArgConstructor
+$ java -jar target/joogle.jar -zeroArgConstructor
 
 **********
 * joogle *
