@@ -10,10 +10,10 @@ When building deserialization attacks, you find yourself asking questions like:
 * What types have non-empty static initializers?
 * What types (meet some other condition)?
 
-This program gives you a very quick way to answer questions like that.
+Joogle gives you a very quick way to answer questions like that. Using an IDE can be helpful for answering some questions like this individually, but never more than one at a time.
 
 ## How do I use it?
-If you want to use some of our preconfigured search filters, just build and run it. Here's an example of searching for gadgets just within the JRE that have a zero-argument constructor:
+If you want to use some of our preconfigured search filters, just build Joogle and run the .jar. Here's an example of searching for gadgets just within the JRE that have a zero-argument constructor:
 
 ```
 $ git pull https://github.com/Contrast-Security-OSS/joogle.git
@@ -80,3 +80,6 @@ joogle.scanPaths(paths, context);
 ```
 
 Happy gadget hunting!
+
+## Limitations
+Joogle only statically analyzes code without the runtime  class hierarchy resolved, and therefore may not provide a truly exhaustive list of matching classes. For instance, java.util.HashMap doesn't implement hashCode() directly, but does through inheritance of java.util.AbstractMap. If you ask Joogle to show all classes in the JRE that implement hashCode() and have a zero-argument constructor, HashMap will not show up.
