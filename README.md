@@ -16,7 +16,7 @@ Joogle gives you a very quick way to answer questions like that. Using an IDE ca
 If you want to use some of our preconfigured search filters, just build Joogle and run the .jar. Here's an example of searching for gadgets just within the JRE that have a zero-argument constructor:
 
 ```
-$ git pull https://github.com/Contrast-Security-OSS/joogle.git
+$ git clone https://github.com/Contrast-Security-OSS/joogle.git
 $ mvn package
 $ java -jar target/joogle.jar -zeroArgConstructor
 
